@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Buyer(models.Model):
-    name = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=30)
     balance = models.DecimalField(max_digits=5, decimal_places=2)
     age = models.IntegerField()
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
-
+from .forms import UserRegister
+from .models import *
 
 def main_page(request):
     title = 'Мой сайт'
@@ -11,7 +12,7 @@ def main_page(request):
 
 def shop(request):
     title = 'Магазин'
-    games = ['Atomic Heart', 'Cyberpunk 2077', 'PayDay 2']
+    games = Game.objects.all()
     context = {
         'title': title,
         'games': games
@@ -21,15 +22,14 @@ def shop(request):
 
 def basket(request):
     title = 'Корзина'
-    context = {'title': title}
+    context = {
+        'title': title
+    }
     return render(request, 'basket.html', context)
 
 
-from .forms import UserRegister
-from .models import Buyer
-
 def sign_up_by_form(request):
-    users = Buyer.objects.all()
+    buyers = Buyer.objects.all()
     info = {}
     if request.method == 'POST':
         form = UserRegister(request.POST)
@@ -38,13 +38,14 @@ def sign_up_by_form(request):
             password = form.cleaned_data['password']
             repeat_password = form.cleaned_data['repeat_password']
             age = form.cleaned_data['age']
-            if username in users:
-                error = 'Пользователь уже существует'
-                info['error'] = error
-                for key, value in info.items():
-                    if value == error:
-                        return HttpResponse(f'{key}: {value}')
-            elif password != repeat_password:
+            for buyer in buyers:
+                if username == buyer.name:
+                    error = 'Пользователь уже существует'
+                    info['error'] = error
+                    for key, value in info.items():
+                        if value == error:
+                            return HttpResponse(f'{key}: {value}')
+            if password != repeat_password:
                 error = 'Пароли не совпадают'
                 info['error'] = error
                 for key, value in info.items():
